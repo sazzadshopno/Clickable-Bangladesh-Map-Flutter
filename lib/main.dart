@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:bd_map/map.dart';
 import 'package:touchable/touchable.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+      MyApp(),
+    );
 
 class MyApp extends StatelessWidget {
   @override
@@ -167,18 +169,5 @@ class PathPainter extends CustomPainter {
   bool shouldRepaint(PathPainter oldDelegate) => true;
 
   @override
-  bool shouldRebuildSemantics(PathPainter oldDelegate) => true;
-}
-
-class PathClipper extends CustomClipper<Path> {
-  final District _district;
-  PathClipper(this._district);
-
-  @override
-  Path getClip(Size size) {
-    return getPathByDistrict(_district);
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+  bool shouldRebuildSemantics(PathPainter oldDelegate) => false;
 }

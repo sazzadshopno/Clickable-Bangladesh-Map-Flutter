@@ -99,34 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  List<Widget> _buildText(scale, offsetX, offsetY) {
-    List<Widget> widgets = [];
-    for (int i = 0; i < districts.length; i++) {
-      final Matrix4 matrix4 = textPosition[District.values[i]];
-
-      if (textPosition[District.values[i]] != null) {
-        matrix4.scale(scale, scale);
-      }
-      print(scale);
-      widgets.add(
-        Transform.translate(
-          offset: Offset(offsetX, offsetY),
-          child: Transform(
-            transform: matrix4 == null ? Matrix4.zero() : matrix4,
-            child: Text(
-              districts[i].toString().replaceFirst('District.', ''),
-              style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.yellow,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      );
-    }
-    return widgets;
-  }
 }
 
 class PathPainter extends CustomPainter {

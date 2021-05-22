@@ -45,47 +45,56 @@ class _MyHomePageState extends State<MyHomePage> {
     final double yScale =
         MediaQuery.of(context).size.height / MapSvgData.height;
     final double scale = xScale < yScale ? xScale : yScale;
-    // scale each path to match canvas size
-// calculate the scaled svg image width and height in order to get right offset
     double scaledSvgWidth = MapSvgData.width * scale;
     double scaledSvgHeight = MapSvgData.height * scale;
     // calculate offset to center the svg image
     double offsetX = (MediaQuery.of(context).size.width - scaledSvgWidth) / 2;
     double offsetY = (MediaQuery.of(context).size.height - scaledSvgHeight) / 2;
+
     return Scaffold(
-      body: Center(
-        child: Stack(
-          children: [
-            Container(
-              color: Colors.transparent,
-              width: double.infinity,
-              height: double.infinity,
-              child: CanvasTouchDetector(
-                builder: (context) => CustomPaint(
-                  painter: PathPainter(
-                    context,
-                    districts,
-                    _selectedPath,
-                    (path) {
-                      setState(() {
-                        if (_selectedPath.contains(path)) {
-                          _selectedPath.remove(path);
-                        } else {
-                          _selectedPath.add(path);
-                        }
-                      });
-                    },
+      body: InteractiveViewer(
+        minScale: 0.1,
+        maxScale: 5,
+        child: Center(
+          child: Stack(
+            children: [
+              Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                height: double.infinity,
+                child: CanvasTouchDetector(
+                  builder: (context) => CustomPaint(
+                    painter: PathPainter(
+                      context,
+                      districts,
+                      _selectedPath,
+                      Offset(offsetX, offsetY),
+                      scale,
+                      (path) {
+                        setState(() {
+                          if (_selectedPath.contains(path)) {
+                            _selectedPath.remove(path);
+                          } else {
+                            _selectedPath.add(path);
+                          }
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            Material(
-              color: Colors.transparent,
-              child: Stack(
-                children: _buildText(scale, offsetX, offsetY),
+              CustomPaint(
+                painter: PathPainter(
+                  context,
+                  [District.Text],
+                  _selectedPath,
+                  Offset(offsetX, offsetY),
+                  scale,
+                  (path) {},
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -95,10 +104,11 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> widgets = [];
     for (int i = 0; i < districts.length; i++) {
       final Matrix4 matrix4 = textPosition[District.values[i]];
-      if (textPosition[District.values[i]] != null) {
-        matrix4.scaled(scale, scale);
-      }
 
+      if (textPosition[District.values[i]] != null) {
+        matrix4.scale(scale, scale);
+      }
+      print(scale);
       widgets.add(
         Transform.translate(
           offset: Offset(offsetX, offsetY),
@@ -107,10 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text(
               districts[i].toString().replaceFirst('District.', ''),
               style: TextStyle(
-                fontSize: 8,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 10,
+                  color: Colors.yellow,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -123,43 +132,62 @@ class _MyHomePageState extends State<MyHomePage> {
 class PathPainter extends CustomPainter {
   final List<District> _district;
   final List<District> curPaths;
+  final Offset offset;
+  final double scale;
   BuildContext context;
+
   Path path;
-  PathPainter(this.context, this._district, this.curPaths, this.onPressed);
+  PathPainter(this.context, this._district, this.curPaths, this.offset,
+      this.scale, this.onPressed);
   final Function(District curPath) onPressed;
   @override
   void paint(Canvas canvas, Size size) {
-    final double xScale = size.width / MapSvgData.width;
-    final double yScale = size.height / MapSvgData.height;
-    final double scale = xScale < yScale ? xScale : yScale;
-
     // scale each path to match canvas size
     final Matrix4 matrix4 = Matrix4.identity();
     matrix4.scale(scale, scale);
-
-    // calculate the scaled svg image width and height in order to get right offset
-    double scaledSvgWidth = MapSvgData.width * scale;
-    double scaledSvgHeight = MapSvgData.height * scale;
-    // calculate offset to center the svg image
-    double offsetX = (size.width - scaledSvgWidth) / 2;
-    double offsetY = (size.height - scaledSvgHeight) / 2;
     TouchyCanvas myCanvas = TouchyCanvas(context, canvas);
     _district.forEach((element) {
       path = getPathByDistrict(element);
-      myCanvas.drawPath(
-        path.transform(matrix4.storage).shift(
-              Offset(offsetX, offsetY),
-            ),
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color =
-              curPaths.contains(element) ? Color(0xfff42a41) : Color(0xff006a4e)
-          ..strokeWidth = 1,
-        onTapDown: (_) {
-          print(element);
-          onPressed(element);
-        },
-      );
+      if (element == District.Text) {
+        myCanvas.drawPath(
+          path.transform(matrix4.storage).shift(
+                offset,
+              ),
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = Colors.yellow
+            ..strokeWidth = 1,
+        );
+      } else {
+        myCanvas.drawPath(
+          path.transform(matrix4.storage).shift(
+                offset,
+              ),
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..color = curPaths.contains(element)
+                ? Color(0xff006a4e)
+                : Color(0xfff42a41)
+            ..strokeWidth = curPaths.contains(element) ? 1 : 2,
+          onTapDown: (_) {
+            print(element);
+            onPressed(element);
+          },
+        );
+        myCanvas.drawPath(
+          path.transform(matrix4.storage).shift(
+                offset,
+              ),
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = curPaths.contains(element)
+                ? Color(0xfff42a41)
+                : Color(0xff006a4e),
+          onTapDown: (_) {
+            onPressed(element);
+          },
+        );
+      }
     });
   }
 

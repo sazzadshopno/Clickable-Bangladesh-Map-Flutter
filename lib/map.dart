@@ -5,7 +5,6 @@
 import 'dart:ui';
 
 import 'package:built_path_annotations/built_path_annotations.dart';
-import 'package:flutter/cupertino.dart';
 part 'map.svg_path.g.dart';
 
 enum District {

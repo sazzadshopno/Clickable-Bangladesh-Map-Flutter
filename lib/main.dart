@@ -12,7 +12,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Clickable Map of Bangladesh',
-      theme: ThemeData(primarySwatch: Colors.blue),
       home: MyHomePage(
         title: 'Clickable Map of Bangladesh',
       ),
@@ -30,8 +29,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // List<District> _pressedDistrict = [];
   List<District> districts = [];
+  List<District> _selectedPath = [];
   @override
   void initState() {
     super.initState();
@@ -40,7 +39,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  List<District> _selectedPath = [];
   @override
   Widget build(BuildContext context) {
     final double xScale = MediaQuery.of(context).size.width / MapSvgData.width;
@@ -109,8 +107,11 @@ class PathPainter extends CustomPainter {
   final Offset offset;
   final double scale;
   BuildContext context;
+  // Change color according to your need
+  final Color textColor = Colors.yellow,
+      selectedColor = Color(0xfff42a41),
+      defaultColor = Color(0xff006a4e);
 
-  Path path;
   PathPainter(this.context, this._district, this.curPaths, this.offset,
       this.scale, this.onPressed);
   final Function(District curPath) onPressed;
@@ -121,7 +122,7 @@ class PathPainter extends CustomPainter {
     matrix4.scale(scale, scale);
     TouchyCanvas myCanvas = TouchyCanvas(context, canvas);
     _district.forEach((element) {
-      path = getPathByDistrict(element);
+      Path path = getPathByDistrict(element);
       if (element == District.Text) {
         myCanvas.drawPath(
           path.transform(matrix4.storage).shift(
@@ -129,7 +130,7 @@ class PathPainter extends CustomPainter {
               ),
           Paint()
             ..style = PaintingStyle.fill
-            ..color = Colors.yellow
+            ..color = textColor
             ..strokeWidth = 1,
         );
       } else {
@@ -139,10 +140,8 @@ class PathPainter extends CustomPainter {
               ),
           Paint()
             ..style = PaintingStyle.stroke
-            ..color = curPaths.contains(element)
-                ? Color(0xff006a4e)
-                : Color(0xfff42a41)
-            ..strokeWidth = curPaths.contains(element) ? 1 : 2,
+            ..color = curPaths.contains(element) ? defaultColor : selectedColor
+            ..strokeWidth = 2,
           onTapDown: (_) {
             print(element);
             onPressed(element);
@@ -154,9 +153,7 @@ class PathPainter extends CustomPainter {
               ),
           Paint()
             ..style = PaintingStyle.fill
-            ..color = curPaths.contains(element)
-                ? Color(0xfff42a41)
-                : Color(0xff006a4e),
+            ..color = curPaths.contains(element) ? selectedColor : defaultColor,
           onTapDown: (_) {
             onPressed(element);
           },

@@ -1,5 +1,5 @@
 ///
-/// Created by Giovanni Terlingen
+/// Created by Sazzad Shopno
 /// See LICENSE file for more information.
 ///
 import 'dart:ui';
@@ -479,31 +479,4 @@ class MapSvgData {
   @SvgPath(
       'M727.2,895l-5.3,6.6l-9.3-4l-2.7-5.3l-8-11.9l4-5.3h6.6l2.7,5.3l9.3,1.3v-5.3l4-10.5l-4-6.6l-2.7-13.2l-1.3-6.6l-2.7-13.2l-2.7-9.2l2.7-13.2l8,2.6l8-4h13.3l8,5.3l12,6.6l6.6,14.5l6.6,18.5l-2.7,5.3l8,17.1l8,22.4l1.3,6.6l-1.3,14.5v9.2l-1.3,10.5l1.3,13.2l4,14.5l1.3,14.5l1.3,11.9l6.6,11.9l-6.6,2.6l-6.6,7.9l-4-2.6l-1.3-6.6l-4-9.2l1.3-5.3l-4-1.3l-4,2.6l-6.6,1.3l-8-2.6l-1.3-5.3l-5.3-13.2l-4-2.6l-5.3,6.6l-2.7,5.3l-5.3-1.3l-6.6,11.9l-4,1.3l-4,5.3l1.3,10.5l-4,9.2l-1.3-13.2l-4-10.5l-1.3-5.3l8-9.2l5.3,5.3l4-7.9l-5.3-10.5l-5.3-9.2l2.7-5.3l-6.6-6.6l-2.7-7.9l-4-10.5l6.6-6.6h10.6v-7.9h6.6v-4L727.2,895L727.2,895z')
   static Path get bandarban => _$MapSvgData_bandarban;
-}
-
-class CustomMatrix4 {
-  final double a, b, c, d, tx, ty;
-
-  CustomMatrix4(this.a, this.b, this.c, this.d, this.tx, this.ty);
-// matrix(a, b, c, d, tx, ty) is a shorthand for matrix3d(a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1)
-  Matrix4 convert() {
-    return Matrix4(
-      a,
-      b,
-      0,
-      0,
-      c,
-      d,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      tx,
-      ty,
-      0,
-      1,
-    );
-  }
 }

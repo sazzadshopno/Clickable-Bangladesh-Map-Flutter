@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:bd_map/map.dart';
 import 'package:touchable/touchable.dart';
@@ -31,6 +33,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<District> districts = [];
   List<District> _selectedPath = [];
+  // Change map size according to your need
+  final double mapWidth = 300, mapHeight = 500;
   @override
   void initState() {
     super.initState();
@@ -41,9 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double xScale = MediaQuery.of(context).size.width / MapSvgData.width;
+    final double xScale =
+        min(mapWidth, MediaQuery.of(context).size.width) / MapSvgData.width;
     final double yScale =
-        MediaQuery.of(context).size.height / MapSvgData.height;
+        min(mapHeight, MediaQuery.of(context).size.height) / MapSvgData.height;
     final double scale = xScale < yScale ? xScale : yScale;
     double scaledSvgWidth = MapSvgData.width * scale;
     double scaledSvgHeight = MapSvgData.height * scale;
